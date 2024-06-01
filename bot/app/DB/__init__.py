@@ -2,6 +2,9 @@ import pymysql.cursors
 from app.helper.config import Config
 import logging
 import sys
+import os
+
+structurePath = os.path.join(os.getcwd(), 'app', 'DB', 'sql', 'create_structure.sql')
 
 conf = Config()
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
@@ -18,7 +21,7 @@ conn = pymysql.connect(host=conf.get_value('HOST'),
                              database=conf.get_value('DATABASE'),
                              cursorclass=pymysql.cursors.DictCursor)
 cursor = conn.cursor()
-with open('bot/app/DB/sql/create_structure.sql', 'r') as sql_file:
+with open(structurePath, 'r') as sql_file:
     sql_script = sql_file.read()
     for sql in sql_script.split(';'):
         try:
