@@ -76,6 +76,10 @@ def get_auction_detail_kb(user_id: int, auction_id: int) -> ReplyKeyboardMarkup:
             callback_data=cbd.AuctionHelpCallback(page='time', auction_id=auction_id).pack()
         ),
         types.InlineKeyboardButton(
+            text = '🔄',
+            callback_data=cbd.AuctionHelpCallback(page='update', auction_id=auction_id).pack()
+        ),
+        types.InlineKeyboardButton(
             text = '⁉️',
             callback_data=cbd.AuctionHelpCallback(page='rules', auction_id=auction_id).pack()
         )

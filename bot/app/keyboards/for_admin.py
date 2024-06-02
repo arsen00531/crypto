@@ -135,6 +135,10 @@ def get_settings_menu_kb(user_id: int) -> ReplyKeyboardMarkup:
         callback_data=cbd.AdminMenuCallback(page='admin_menu_settings_admins')
     )
     keyboard.button(
+        text = get_msg_lang('admin_menu_bl_msg', user_id),
+        callback_data=cbd.AdminMenuCallback(page='blacklist_menu')
+    )
+    keyboard.button(
         text = get_msg_lang('admin_menu_settings_payment_method_msg', user_id),
         callback_data=cbd.AdminMenuCallback(page='admin_menu_settings_payment_method')
     )
@@ -295,10 +299,6 @@ def get_actions_admin_kb(user_id: int, auction_id: int) -> ReplyKeyboardMarkup:
     keyboard.button(
         text = get_msg_lang('admin_menu_publish_msg', user_id),
         callback_data=cbd.AuctionSettingsCallback(action='publish', auction_id=auction_id)
-    )
-    keyboard.button(
-        text = get_msg_lang('admin_menu_bl_msg', user_id),
-        callback_data=cbd.AdminMenuCallback(page='blacklist_menu')
     )
     keyboard.button(
         text = get_msg_lang('admin_menu_edit_msg', user_id),

@@ -5,6 +5,7 @@ from app.helper import config
 import logging
 import sys
 import app.DB
+import asyncio
 from queue import Queue
 from threading import Thread
 from app.controller_auctions.controller import controller

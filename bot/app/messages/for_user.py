@@ -28,6 +28,8 @@ def active_auctions(tg_id: int, type: str) -> str:
 def msg_auction(tg_id: int, auction_id: str) -> str:
     auction = Auction.get_auction_by_id_with_bid(auction_id)[0]
     conf = Config()
+    user_bid = Bid.get_bid_by_tg_id(tg_id, auction_id)
+    user_bid = user_bid[0]['money'] if len(user_bid) > 0 else '-'
     last_price = auction['money'] if auction['money'] else auction['price']
     msg = (get_msg_lang('lot_msg', tg_id) % (auction['name'], 
                                              auction['type'], 
@@ -39,6 +41,10 @@ def msg_auction(tg_id: int, auction_id: str) -> str:
                                              auction['description'],
                                              last_price, 
                                              conf.get_value('CURRENCY')))
+    if user_bid != '-':
+        msg += (get_msg_lang('lot_your_bid_msg', tg_id) % (user_bid, 
+                                                conf.get_value('CURRENCY')))
+        
     bids = Bid.get_bids_by_auction_id(auction_id)[-3:]
     bids = bids if len(bids) > 0 else []
     bids.reverse()

@@ -350,6 +350,16 @@ async def delete_auction(query: CallbackQuery, callback_data: cbd.AuctionSetting
                     chat_id=user['tg_id'],
                     text=msg_user.notification_start_msg(user['tg_id'], auction)
                 )
+                if len(Auction.get_opened_auction_by_id(callback_data.auction_id)) != 0 and \
+                    Auction.get_auction_by_id(callback_data.auction_id)[0]['picture'] != None: # Аукцион с фото
+
+                    photo = FSInputFile('bot/app/static/' + Auction.get_auction_by_id(callback_data.auction_id)[0]['picture'])
+                    await query.bot.send_photo(
+                        chat_id=user['tg_id'],
+                        photo=photo,
+                        caption=msg_user.msg_auction(query.from_user.id, callback_data.auction_id),
+                        reply_markup=kb_usr.get_auction_detail_kb(query.from_user.id, callback_data.auction_id)
+                    )
     except BaseException:
         await query.answer(
                 text='Error'

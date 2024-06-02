@@ -154,3 +154,7 @@ def msg_bids(tg_id: int, auction_id: str) -> str:
 def msg_confirmation_delete(tg_id: int) -> str:
     msg = get_msg_lang('admin_menu_delete_confirmation_msg', tg_id)
     return msg
+
+def winner_msg(tg_id: int, money: int, user_link: str) -> str:
+    msg = (get_msg_lang('admin_notification_auction_end_msg', tg_id) % (str(money), user_link))
+    return msg

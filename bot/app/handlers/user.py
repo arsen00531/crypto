@@ -140,6 +140,13 @@ async def get_back_menu(query: CallbackQuery, callback_data: cbd.AuctionHelpCall
     except BaseException:
         pass
 
+@router.callback_query(cbd.AuctionHelpCallback.filter(F.page == "update"))
+async def get_back_menu(query: CallbackQuery, callback_data: cbd.AuctionHelpCallback):
+    try:
+        await answer_auction_detail(query, callback_data)
+    except BaseException:
+        pass
+
 @router.callback_query(cbd.AuctionHelpCallback.filter(F.page == "rules"))
 async def get_back_menu(query: CallbackQuery, callback_data: cbd.AuctionHelpCallback):
     try:

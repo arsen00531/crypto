@@ -13,6 +13,7 @@ from threading import Thread
 import app.keyboards.for_user as kb_usr
 import app.callbackdata.custom as cbd
 import app.messages.for_user as msg
+import app.messages.for_admin as msg_adm
 from app.DB.DB import User, Auction, Bid
 import pymysql.cursors
 from app.helper.config import Config
@@ -132,5 +133,13 @@ async def send_notification(auction, bot):
                 await bot.send_message(user[0]['tg_id'], 
                                     msg.winners_msg(user[0]['tg_id'], money),
                                     reply_markup=kb_usr.get_back_kb(user[0]['tg_id']))
+                admins = User.get_admins()
+                for admin in admins:
+                    try:
+                        await bot.send_message(admin['tg_id'], 
+                                    msg_adm.winner_msg(admin['tg_id'], money, user[0]['tg_link']))
+                    except BaseException:
+                        pass
+        
             except BaseException:
                 pass

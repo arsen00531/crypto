@@ -383,3 +383,11 @@ class Bid():
             cursor.close()
             conn.close()
         return
+    
+    def get_bid_by_tg_id(tg_id: int, auction_id: int):
+        """
+        Возвращает ставку по `tg_id` пользователя
+        """
+        conn, cursor = Bid._get_connection_cursor()
+        cursor.execute("SELECT * FROM `bid` WHERE `user_id` = (SELECT `id` FROM `user` WHERE `tg_id` = %s) AND `auction_id` = %s ORDER BY `money` DESC;", (str(tg_id), str(auction_id)))
+        return cursor.fetchall()
