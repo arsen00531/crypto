@@ -5,6 +5,7 @@ from aiogram.types import Message, ReplyKeyboardRemove, FSInputFile
 from aiogram.filters import Command, CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
+import os
 
 import app.keyboards.for_user as kb_usr
 import app.keyboards.for_admin as kb_adm
@@ -15,6 +16,7 @@ from app.DB.DB import User, Auction, Bid
 from app.helper.config import Config
 
 router = Router()
+path = os.path.join(os.getcwd(), 'bot', 'app', 'static')
 
 class get_lang(StatesGroup):
     lang_add = State()
@@ -33,7 +35,8 @@ async def cmd_start(message: Message):
                 msg.start_msg(message.from_user.id),
                 reply_markup=kb_usr.get_type_auction_kb(message.from_user.id)
             )
-    except BaseException:
+    except BaseException as err:
+        print(err)
         pass
 
 @router.callback_query(cbd.LangCallback.filter())
@@ -42,7 +45,7 @@ async def answer_after_lang(query: CallbackQuery, callback_data: cbd.LangCallbac
         if User.is_user_admin(query.from_user.id):
             User.change_language(query.from_user.id, callback_data.lang_code)
             conf = Config()
-            photo = FSInputFile('bot/app/static/' + conf.get_value('LOGO'))
+            photo = FSInputFile(os.path.join(path, conf.get_value('LOGO')))
             await query.message.delete()
             await query.message.answer_photo(
                 photo=photo,
@@ -80,7 +83,7 @@ async def answer_auction_detail(query: CallbackQuery, callback_data: cbd.Auction
         elif len(Auction.get_opened_auction_by_id(callback_data.auction_id)) != 0 and \
             Auction.get_auction_by_id(callback_data.auction_id)[0]['picture'] != None: # Аукцион с фото
 
-            photo = FSInputFile('bot/app/static/' + Auction.get_auction_by_id(callback_data.auction_id)[0]['picture'])
+            photo = FSInputFile(os.path.join(path, Auction.get_auction_by_id(callback_data.auction_id)[0]['picture']))
             await query.message.delete()
             await query.message.answer_photo(
                 photo=photo,
@@ -115,7 +118,7 @@ async def answer_add_bill(query: CallbackQuery, callback_data: cbd.BidMenuCallba
             elif len(Auction.get_auction_by_id(callback_data.auction_id)) != 0 and \
                 Auction.get_auction_by_id(callback_data.auction_id)[0]['picture'] != None: # Аукцион с фото
 
-                photo = FSInputFile('bot/app/static/' + Auction.get_auction_by_id(callback_data.auction_id)[0]['picture'])
+                photo = FSInputFile(os.path.join(path, Auction.get_auction_by_id(callback_data.auction_id)[0]['picture']))
                 await query.message.delete()
                 await query.message.answer_photo(
                     photo=photo,

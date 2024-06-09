@@ -9,7 +9,7 @@ import asyncio
 from queue import Queue
 from threading import Thread
 from app.controller_auctions.controller import controller
-
+from app.cryptomus import cryptomus
 
 async def main():
     conf = config.Config()

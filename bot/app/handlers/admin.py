@@ -6,6 +6,7 @@ from aiogram.filters import Command, CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 import re
+import os
 from hashlib import sha256
 
 import app.keyboards.for_user as kb_usr
@@ -17,6 +18,7 @@ from app.DB.DB import User, Auction, Bid
 from app.helper.config import Config
 
 router = Router()
+path = os.path.join(os.getcwd(), 'bot', 'app', 'static')
 
 class CreateNewAuction(StatesGroup):
     photo_set = State()
@@ -66,8 +68,9 @@ async def photo_set_(message: Message, state: FSMContext):
             file = await message.bot.get_file(file_id)
             file_path = file.file_path
             extention = file_path.split('.')[-1]
-            await message.bot.download_file(file_path, f"bot/app/static/{file_unique_id}.{extention}")
-            await state.update_data(picture=f"{file_unique_id}.{extention}")
+            dotFile = f'{file_unique_id}.{extention}'
+            await message.bot.download_file(file_path, f"{os.path.join(path, dotFile)}")
+            await state.update_data(picture=dotFile)
             await message.answer(
                 text=msg.name_set_msg(message.from_user.id)
             )
@@ -219,7 +222,7 @@ async def time_leinght_set_(message: Message, state: FSMContext):
                 )
             elif Auction.get_auction_by_id(id)[0]['picture'] != None: # Аукцион с фото
 
-                photo = FSInputFile('bot/app/static/' + Auction.get_auction_by_id(id)[0]['picture'])
+                photo = FSInputFile(os.path.join(path, Auction.get_auction_by_id(id)[0]['picture']))
 
                 await message.answer_photo(
                     photo=photo,
@@ -288,7 +291,7 @@ async def type_set_(query: CallbackQuery, state: FSMContext, callback_data: cbd.
                         )
                     elif Auction.get_auction_by_id(id)[0]['picture'] != None: # Аукцион с фото
 
-                        photo = FSInputFile('bot/app/static/' + Auction.get_auction_by_id(id)[0]['picture'])
+                        photo = FSInputFile(os.path.join(path, Auction.get_auction_by_id(id)[0]['picture']))
 
                         await query.message.answer_photo(
                             photo=photo,
@@ -303,7 +306,7 @@ async def type_set_(query: CallbackQuery, state: FSMContext, callback_data: cbd.
 async def admin_menu_my_auc(query: CallbackQuery, callback_data: cbd.AdminMenuCallback):
     if User.is_user_admin(query.from_user.id):
         conf = Config()
-        photo = FSInputFile('bot/app/static/' + conf.get_value('LOGO'))
+        photo = FSInputFile(os.path.join(path, conf.get_value('LOGO')))
         await query.message.delete()
         await query.message.answer_photo(
             photo=photo,
@@ -324,7 +327,7 @@ async def answer_auction_detail(query: CallbackQuery, callback_data: cbd.Auction
                 )
             elif Auction.get_auction_by_id(callback_data.auction_id)[0]['picture'] != None: # Аукцион с фото
 
-                photo = FSInputFile('bot/app/static/' + Auction.get_auction_by_id(callback_data.auction_id)[0]['picture'])
+                photo = FSInputFile(os.path.join(path, Auction.get_auction_by_id(id)[0]['picture']))
                 await query.message.delete()
                 await query.message.answer_photo(
                     photo=photo,
@@ -353,7 +356,7 @@ async def delete_auction(query: CallbackQuery, callback_data: cbd.AuctionSetting
                 if len(Auction.get_opened_auction_by_id(callback_data.auction_id)) != 0 and \
                     Auction.get_auction_by_id(callback_data.auction_id)[0]['picture'] != None: # Аукцион с фото
 
-                    photo = FSInputFile('bot/app/static/' + Auction.get_auction_by_id(callback_data.auction_id)[0]['picture'])
+                    photo = FSInputFile(os.path.join(path, Auction.get_auction_by_id(id)[0]['picture']))
                     await query.bot.send_photo(
                         chat_id=user['tg_id'],
                         photo=photo,
@@ -378,7 +381,7 @@ async def edit_auction(query: CallbackQuery, callback_data: cbd.AuctionSettingsC
                 )
             elif Auction.get_auction_by_id(callback_data.auction_id)[0]['picture'] != None: # Аукцион с фото
 
-                photo = FSInputFile('bot/app/static/' + Auction.get_auction_by_id(callback_data.auction_id)[0]['picture'])
+                photo = FSInputFile(os.path.join(path, Auction.get_auction_by_id(id)[0]['picture']))
                 await query.message.delete()
                 await query.message.answer_photo(
                     photo=photo,
@@ -439,9 +442,10 @@ async def photo_set_(message: Message, state: FSMContext):
             file = await message.bot.get_file(file_id)
             file_path = file.file_path
             extention = file_path.split('.')[-1]
-            await message.bot.download_file(file_path, f"bot/app/static/{file_unique_id}.{extention}")
+            dotFile = f'{file_unique_id}.{extention}'
+            await message.bot.download_file(file_path, os.path.join(path, dotFile))
             data = await state.get_data()
-            Auction.update_auction(data['auction_id'], 'picture', f"{file_unique_id}.{extention}")
+            Auction.update_auction(data['auction_id'], 'picture', dotFile)
             await cmd_start(message)
         await state.clear()
     except BaseException:
@@ -492,7 +496,7 @@ async def get_bids_list(query: CallbackQuery, callback_data: cbd.AuctionSettings
     try:
         if User.is_user_admin(query.from_user.id):
             conf = Config()
-            photo = FSInputFile('bot/app/static/' + conf.get_value('LOGO'))
+            photo = FSInputFile(os.path.join(path, conf.get_value('LOGO')))
             await query.message.delete()
             await query.message.answer_photo(
                 photo=photo,
@@ -506,7 +510,7 @@ async def get_bids_detail(query: CallbackQuery, callback_data: cbd.BidSettingsCa
     try:
         if User.is_user_admin(query.from_user.id):
             conf = Config()
-            photo = FSInputFile('bot/app/static/' + conf.get_value('LOGO'))
+            photo = FSInputFile(os.path.join(path, conf.get_value('LOGO')))
             await query.message.delete()
             await query.message.answer_photo(
                 photo=photo,
@@ -521,7 +525,7 @@ async def get_bids_delete(query: CallbackQuery, callback_data: cbd.BidSettingsCa
         if User.is_user_admin(query.from_user.id):
             Bid.delete_bid_by_id(callback_data.bid_id)
             conf = Config()
-            photo = FSInputFile('bot/app/static/' + conf.get_value('LOGO'))
+            photo = FSInputFile(os.path.join(path, conf.get_value('LOGO')))
             await query.message.delete()
             await query.message.answer_photo(
                 photo=photo,
@@ -540,7 +544,7 @@ async def get_bids_ban_delete(query: CallbackQuery, callback_data: cbd.BidSettin
             Bid.delete_bid_by_id(callback_data.bid_id)
             User.status_change_by_nickname(query.from_user.id, str(username), 'banned')
             conf = Config()
-            photo = FSInputFile('bot/app/static/' + conf.get_value('LOGO'))
+            photo = FSInputFile(os.path.join(path, conf.get_value('LOGO')))
             await query.message.delete()
             await query.message.answer_photo(
                 photo=photo,
@@ -593,7 +597,7 @@ async def admin_menu_settings(query: CallbackQuery, callback_data: cbd.AdminMenu
     await state.clear()
     if User.is_user_admin(query.from_user.id):
         conf = Config()
-        photo = FSInputFile('bot/app/static/' + conf.get_value('LOGO'))
+        photo = FSInputFile(os.path.join(path, conf.get_value('LOGO')))
         await query.message.delete()
         await query.message.answer_photo(
             photo=photo,
@@ -614,7 +618,7 @@ async def admin_menu_settings_detail_step(query: CallbackQuery, callback_data: c
     await state.clear()
     if User.is_user_admin(query.from_user.id):
         conf = Config()
-        photo = FSInputFile('bot/app/static/' + conf.get_value('LOGO'))
+        photo = FSInputFile(os.path.join(path, conf.get_value('LOGO')))
         await query.message.delete()
         await query.message.answer_photo(
             photo=photo,
@@ -646,7 +650,7 @@ async def admin_menu_settings_detail_antisniper(query: CallbackQuery, callback_d
     await state.clear()
     if User.is_user_admin(query.from_user.id):
         conf = Config()
-        photo = FSInputFile('bot/app/static/' + conf.get_value('LOGO'))
+        photo = FSInputFile(os.path.join(path, conf.get_value('LOGO')))
         await query.message.delete()
         await query.message.answer_photo(
             photo=photo,
@@ -678,7 +682,7 @@ async def admin_menu_settings_detail_currency(query: CallbackQuery, callback_dat
     await state.clear()
     if User.is_user_admin(query.from_user.id):
         conf = Config()
-        photo = FSInputFile('bot/app/static/' + conf.get_value('LOGO'))
+        photo = FSInputFile(os.path.join(path, conf.get_value('LOGO')))
         await query.message.delete()
         await query.message.answer_photo(
             photo=photo,
@@ -707,7 +711,7 @@ async def admin_menu_settings_detail_rules(query: CallbackQuery, callback_data: 
     await state.clear()
     if User.is_user_admin(query.from_user.id):
         conf = Config()
-        photo = FSInputFile('bot/app/static/' + conf.get_value('LOGO'))
+        photo = FSInputFile(os.path.join(path, conf.get_value('LOGO')))
         await query.message.delete()
         await query.message.answer_photo(
             photo=photo,
@@ -737,7 +741,7 @@ async def rules_set_(message: Message, state: FSMContext):
 async def admin_menu_settings_detail_rules(query: CallbackQuery, callback_data: cbd.AdminMenuCallback, state: FSMContext):
     if User.is_user_admin(query.from_user.id):
         conf = Config()
-        photo = FSInputFile('bot/app/static/' + conf.get_value('LOGO'))
+        photo = FSInputFile(os.path.join(path, conf.get_value('LOGO')))
         await query.message.delete()
         await query.message.answer_photo(
             photo=photo,
@@ -748,7 +752,7 @@ async def admin_menu_settings_detail_rules(query: CallbackQuery, callback_data: 
 async def admin_menu_settings_detail_rules(query: CallbackQuery, callback_data: cbd.DeleteAdminsCallback, state: FSMContext):
     if User.is_user_admin(query.from_user.id):
         conf = Config()
-        photo = FSInputFile('bot/app/static/' + conf.get_value('LOGO'))
+        photo = FSInputFile(os.path.join(path, conf.get_value('LOGO')))
         await query.message.delete()
         await query.message.answer_photo(
             photo=photo,
@@ -760,7 +764,7 @@ async def admin_menu_settings_detail_rules(query: CallbackQuery, callback_data: 
 async def admin_menu_settings_detail_rules(query: CallbackQuery, callback_data: cbd.DeleteAdminsCallback, state: FSMContext):
     if User.is_user_admin(query.from_user.id):
         conf = Config()
-        photo = FSInputFile('bot/app/static/' + conf.get_value('LOGO'))
+        photo = FSInputFile(os.path.join(path, conf.get_value('LOGO')))
         await query.message.delete()
         await query.message.answer_photo(
             photo=photo,
@@ -773,7 +777,7 @@ async def admin_menu_settings_detail_rules(query: CallbackQuery, callback_data: 
     if User.is_user_admin(query.from_user.id):
         User.status_change(query.from_user.id, callback_data.id, 'user')
         conf = Config()
-        photo = FSInputFile('bot/app/static/' + conf.get_value('LOGO'))
+        photo = FSInputFile(os.path.join(path, conf.get_value('LOGO')))
         await query.message.delete()
         await query.message.answer_photo(
             photo=photo,
@@ -785,7 +789,7 @@ async def new_admin_(query: CallbackQuery, callback_data: cbd.AdminMenuCallback,
     await state.clear()
     if User.is_user_admin(query.from_user.id):
         conf = Config()
-        photo = FSInputFile('bot/app/static/' + conf.get_value('LOGO'))
+        photo = FSInputFile(os.path.join(path, conf.get_value('LOGO')))
         await query.message.delete()
         await query.message.answer_photo(
             photo=photo,
@@ -819,7 +823,7 @@ async def admin_menu_settings_bl(query: CallbackQuery, callback_data: cbd.AdminM
     await state.clear()
     if User.is_user_admin(query.from_user.id):
         conf = Config()
-        photo = FSInputFile('bot/app/static/' + conf.get_value('LOGO'))
+        photo = FSInputFile(os.path.join(path, conf.get_value('LOGO')))
         await query.message.delete()
         await query.message.answer_photo(
             photo=photo,
@@ -830,7 +834,7 @@ async def admin_menu_settings_bl(query: CallbackQuery, callback_data: cbd.AdminM
 async def admin_menu_settings_detail_bl(query: CallbackQuery, callback_data: cbd.AdminMenuCallback, state: FSMContext):
     if User.is_user_admin(query.from_user.id):
         conf = Config()
-        photo = FSInputFile('bot/app/static/' + conf.get_value('LOGO'))
+        photo = FSInputFile(os.path.join(path, conf.get_value('LOGO')))
         await query.message.delete()
         await query.message.answer_photo(
             photo=photo,
@@ -842,7 +846,7 @@ async def admin_menu_settings_detail_bl(query: CallbackQuery, callback_data: cbd
 async def admin_menu_settings_add_to_bl(query: CallbackQuery, callback_data: cbd.AdminMenuCallback, state: FSMContext):
     if User.is_user_admin(query.from_user.id):
         conf = Config()
-        photo = FSInputFile('bot/app/static/' + conf.get_value('LOGO'))
+        photo = FSInputFile(os.path.join(path, conf.get_value('LOGO')))
         await query.message.delete()
         await query.message.answer_photo(
             photo=photo,
@@ -870,7 +874,7 @@ async def ban_set_(message: Message, state: FSMContext):
 async def admin_menu_settings_add_to_bl(query: CallbackQuery, callback_data: cbd.AdminMenuCallback, state: FSMContext):
     if User.is_user_admin(query.from_user.id):
         conf = Config()
-        photo = FSInputFile('bot/app/static/' + conf.get_value('LOGO'))
+        photo = FSInputFile(os.path.join(path, conf.get_value('LOGO')))
         await query.message.delete()
         await query.message.answer_photo(
             photo=photo,
@@ -899,7 +903,7 @@ async def unban_set_(message: Message, state: FSMContext):
 async def admin_menu_settings(query: CallbackQuery, callback_data: cbd.AdminMenuCallback):
     if User.is_user_admin(query.from_user.id):
         conf = Config()
-        photo = FSInputFile('bot/app/static/' + conf.get_value('LOGO'))
+        photo = FSInputFile(os.path.join(path, conf.get_value('LOGO')))
         await query.message.delete()
         await query.message.answer_photo(
             photo=photo,
@@ -911,7 +915,7 @@ async def admin_menu_settings(query: CallbackQuery, callback_data: cbd.AdminMenu
 async def admin_menu_settings_win(query: CallbackQuery, callback_data: cbd.AdminMenuCallback):
     if User.is_user_admin(query.from_user.id):
         conf = Config()
-        photo = FSInputFile('bot/app/static/' + conf.get_value('LOGO'))
+        photo = FSInputFile(os.path.join(path, conf.get_value('LOGO')))
         conf.set_value('WIN_NOTIFICATION', (not conf.get_value('WIN_NOTIFICATION')))
         await query.message.delete()
         await query.message.answer_photo(
@@ -924,7 +928,7 @@ async def admin_menu_settings_win(query: CallbackQuery, callback_data: cbd.Admin
 async def admin_menu_settings_lose(query: CallbackQuery, callback_data: cbd.AdminMenuCallback):
     if User.is_user_admin(query.from_user.id):
         conf = Config()
-        photo = FSInputFile('bot/app/static/' + conf.get_value('LOGO'))
+        photo = FSInputFile(os.path.join(path, conf.get_value('LOGO')))
         conf.set_value('LOOSE_NOTIFICATION', (not conf.get_value('LOOSE_NOTIFICATION')))
         await query.message.delete()
         await query.message.answer_photo(
@@ -948,7 +952,7 @@ async def help_vid(query: CallbackQuery, callback_data: cbd.AdminMenuCallback):
     try:
         if User.is_user_admin(query.from_user.id):
             conf = Config()
-            video = FSInputFile('bot/app/static/' + conf.get_value('HELP'))
+            video = FSInputFile(os.path.join(path, conf.get_value('HELP')))
             await query.message.answer_video(
                 video=video
             )

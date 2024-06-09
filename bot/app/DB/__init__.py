@@ -4,7 +4,7 @@ import logging
 import sys
 import os
 
-structurePath = os.path.join(os.getcwd(), 'app', 'DB', 'sql', 'create_structure.sql')
+structurePath = os.path.join(os.getcwd(), 'bot', 'app', 'DB', 'sql', 'create_structure.sql')
 
 conf = Config()
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
