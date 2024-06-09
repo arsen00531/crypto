@@ -1,7 +1,8 @@
 import yaml
 import os
+from pathlib import *
 
-configPath = os.path.join(os.getcwd(), 'app', 'data', 'config.yaml')
+configPath = os.path.join(os.getcwd(), 'bot', 'app', 'data', 'config.yaml')
 
 class Config(object):
     def __init__(self) -> None:
